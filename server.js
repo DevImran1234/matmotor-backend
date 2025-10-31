@@ -16,7 +16,7 @@ app.use(express.json());
 // ✅ Allow frontend domains
 app.use(
   cors({
-    origin: ["https://matmotors.uk", "http://localhost:5173"],
+    origin: ["https://matmotors.uk", "http://localhost:8080" , "https://mat-motors-dashboard.vercel.app/"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
