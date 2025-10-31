@@ -120,13 +120,16 @@ router.post("/", upload.array("images", 10), async (req, res) => {
  */
 router.get("/", async (req, res) => {
   try {
+    console.log("🚗 [GET /api/cars] Fetching all cars...");
     const cars = await Car.find().sort({ createdAt: -1 });
+    console.log(`✅ Found ${cars.length} cars`);
     res.status(200).json(cars);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching cars", error });
+    console.error("❌ Error in /api/cars:", error);
+    res.status(500).json({ message: "Error fetching cars", error: error.message });
   }
 });
+
 
 /**
  * @swagger

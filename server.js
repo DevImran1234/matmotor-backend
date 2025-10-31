@@ -16,17 +16,21 @@ app.use(express.json());
 // ✅ Allow frontend domains
 app.use(
   cors({
-    origin: ["https://matmotors.uk", "http://localhost:8080" , "https://mat-motors-dashboard.vercel.app"],
+    origin: [/matmotors\.uk$/, /vercel\.app$/, "http://localhost:8080"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
 
+
 // MongoDB connect
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.log("❌ MongoDB Error:", err));
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
+})
+.then(() => console.log("✅ MongoDB Connected"))
+.catch((err) => console.log("❌ MongoDB Error:", err));
+
 
 // Swagger setup
 const swaggerOptions = {
