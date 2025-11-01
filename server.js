@@ -22,17 +22,15 @@ app.use(
   })
 );
 
-
-// MongoDB connect
-mongoose.connect('MONGO_URI=mongodb+srv://imrantahirsubhani_db_user:DiuP4baCVOuKa7Ae@cluster0.o3wl22a.mongodb.net/matmotorDB?retryWrites=true&w=majority&appName=Cluster0', {
+// ✅ MongoDB connection
+mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 10000,
   socketTimeoutMS: 45000,
 })
 .then(() => console.log("✅ MongoDB Connected"))
 .catch((err) => console.log("❌ MongoDB Error:", err));
 
-
-// Swagger setup
+// ✅ Swagger setup
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -42,10 +40,7 @@ const swaggerOptions = {
       description: "API for admin to manage cars with multiple images",
     },
     servers: [
-      {
-        url: "http://localhost:5000",
-        description: "Local server",
-      },
+      { url: "http://localhost:5000", description: "Local server" },
     ],
   },
   apis: ["./routes/*.js"],
@@ -54,9 +49,10 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Routes
+// ✅ Routes
 app.use("/api/cars", carRoutes);
 app.use("/api/admin", adminRoutes);
 
+// ✅ Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚗 Server running on port ${PORT}`));
