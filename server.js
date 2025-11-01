@@ -24,7 +24,7 @@ app.use(
 
 
 // MongoDB connect
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect('mongodb+srv://imrantahirsubhani_db_user:DiuP4baCVOuKa7Ae@cluster0.o3wl22a.mongodb.net/?appName=Cluster0', {
   serverSelectionTimeoutMS: 10000,
   socketTimeoutMS: 45000,
 })
