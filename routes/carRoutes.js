@@ -32,61 +32,93 @@ const upload = multer({ storage });
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Car name
+ *               carBrand:
+ *                 type: string
+ *                 description: Brand of the car (e.g. Toyota, BMW)
+ *               carModel:
+ *                 type: string
+ *                 description: Specific model name (e.g. Corolla, X5)
  *               price:
  *                 type: string
+ *                 description: Price of the car
  *               status:
  *                 type: string
  *                 enum: [in-stock, out-of-stock]
+ *                 description: Availability status
  *               color:
  *                 type: string
+ *                 description: Car color
  *               model:
  *                 type: string
+ *                 description: Model year (e.g. 2023)
  *               mileage:
  *                 type: string
+ *                 description: Mileage details
  *               bodyType:
  *                 type: string
+ *                 description: Body type of the car (e.g. SUV, Sedan)
  *               aboutCar:
  *                 type: string
+ *                 description: Short info about the car
  *               description:
  *                 type: string
+ *                 description: Detailed description
  *               images:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
+ *                 description: Upload multiple car images
  *     responses:
  *       201:
  *         description: Car uploaded successfully
+ *       400:
+ *         description: Missing required fields
  *       500:
  *         description: Error uploading car
  */
+
 router.post("/", upload.array("images", 10), async (req, res) => {
   try {
     const {
       name,
-      carBrand,   
-      carModel,   
+      carBrand,
+      carModel,
       price,
       status,
       color,
       model,
       mileage,
-            aboutCar,
+      aboutCar,
       description,
     } = req.body;
 
-    const imageUrls = [];
-    for (const file of req.files) {
-      const b64 = Buffer.from(file.buffer).toString("base64");
-      const dataURI = `data:${file.mimetype};base64,${b64}`;
-      const result = await cloudinary.uploader.upload(dataURI, { folder: "cars" });
-      imageUrls.push(result.secure_url);
+    // Validate required fields
+    if (!name || !carBrand || !carModel || !price) {
+      return res.status(400).json({
+        message: "Missing required fields: name, carBrand, carModel, price",
+      });
     }
 
+    // Upload images to Cloudinary
+    const imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const b64 = Buffer.from(file.buffer).toString("base64");
+        const dataURI = `data:${file.mimetype};base64,${b64}`;
+        const result = await cloudinary.uploader.upload(dataURI, {
+          folder: "cars",
+        });
+        imageUrls.push(result.secure_url);
+      }
+    }
+
+    // Create and save car
     const car = new Car({
       name,
-      carBrand,   
-      carModel,   
+      carBrand,
+      carModel,
       price,
       status,
       color,
@@ -99,12 +131,19 @@ router.post("/", upload.array("images", 10), async (req, res) => {
 
     await car.save();
 
-    res.status(201).json({ message: "Car uploaded successfully", car });
+    res.status(201).json({
+      message: "✅ Car uploaded successfully",
+      car,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error uploading car", error });
+    console.error("❌ Error uploading car:", error);
+    res.status(500).json({
+      message: "Error uploading car",
+      error: error.message || error,
+    });
   }
 });
+
 
 /**
  * @swagger
