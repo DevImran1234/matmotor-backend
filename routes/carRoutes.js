@@ -90,14 +90,20 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       color,
       model,
       mileage,
-      aboutCar,
       description,
+      fuelType,
+      engineCapacity,
+      gear,
+      doors,
+      seats,
+      emissionClass,
+      previousOwners,  // Add previousOwners to the request body
     } = req.body;
 
     // Validate required fields
-    if (!name || !carBrand || !carModel || !price) {
+    if (!name || !carBrand || !carModel || !price || !fuelType || !doors || !seats || previousOwners === undefined) {
       return res.status(400).json({
-        message: "Missing required fields: name, carBrand, carModel, price",
+        message: "Missing required fields: name, carBrand, carModel, price, fuelType, doors, seats, previousOwners",
       });
     }
 
@@ -124,8 +130,14 @@ router.post("/", upload.array("images", 10), async (req, res) => {
       color,
       model,
       mileage,
-      aboutCar,
       description,
+      fuelType,
+      engineCapacity,
+      gear,
+      doors,
+      seats,
+      emissionClass,
+      previousOwners,  // Save previousOwners
       images: imageUrls,
     });
 
@@ -145,6 +157,10 @@ router.post("/", upload.array("images", 10), async (req, res) => {
 });
 
 
+
+
+
+
 /**
  * @swagger
  * /api/cars:
@@ -162,12 +178,15 @@ router.get("/", async (req, res) => {
     console.log("🚗 [GET /api/cars] Fetching all cars...");
     const cars = await Car.find().sort({ createdAt: -1 });
     console.log(`✅ Found ${cars.length} cars`);
+    
+    // Ensure the cars include the 'doors' field
     res.status(200).json(cars);
   } catch (error) {
     console.error("❌ Error in /api/cars:", error);
     res.status(500).json({ message: "Error fetching cars", error: error.message });
   }
 });
+
 
 
 /**
