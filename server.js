@@ -1,22 +1,28 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import carRoutes from "./routes/carRoutes.js";
+import disasterRoutes from "./routes/disasterRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import cors from "cors";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import protect from "./middleware/authMiddleware.js";
+import userRoutes from "./routes/usersRoutes.js";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// ✅ Allow frontend domains
+// ✅ Allow frontend domains including the new one
 app.use(
   cors({
-    origin: [/matmotors\.uk$/, /vercel\.app$/, "http://localhost:8080"],
+    origin: [
+      /matmotors\.uk$/, 
+      /vercel\.app$/, 
+      "http://localhost:8080", 
+      "https://disaster-relief-dash.lovable.app/" // Add the new domain here
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
@@ -24,7 +30,7 @@ app.use(
 
 // ✅ MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI, {
+  .connect('mongodb+srv://imrantahirsubhani_db_user:V02IHAA4CQYiopSd@cluster0.dzhsnnx.mongodb.net/?appName=Cluster0', {
     serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
   })
@@ -36,9 +42,9 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Car Management API",
+      title: "Disaster Management API",
       version: "1.0.0",
-      description: "API for admin to manage cars with multiple images",
+      description: "API for admin to manage disaster with multiple images",
     },
     servers: [
       { url: "http://localhost:5000", description: "Local server" },
@@ -51,8 +57,9 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ✅ Routes
-app.use("/api/cars", carRoutes);
+app.use("/api/houses", disasterRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/auth", userRoutes)
 
 // ✅ Server
 const PORT = process.env.PORT || 5000;
